@@ -18,5 +18,5 @@ public class Server {
     private String id;
     private String name;
     private String endpoint;
-    private boolean is_active;
+    private Boolean isActive;
 }
