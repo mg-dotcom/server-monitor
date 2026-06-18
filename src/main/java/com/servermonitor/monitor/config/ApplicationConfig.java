@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.client.RestClient;
 
 @Configuration
 @RequiredArgsConstructor
@@ -41,4 +42,11 @@ public class ApplicationConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
+
+    // ถ้าเป็น Bean
+    @Bean
+    public RestClient restClient() {
+        return RestClient.create();
+    }
+    // Spring สร้างให้ "ครั้งเดียว" แล้วแจกใช้ทุกที่ที่ต้องการ (Singleton)
 }

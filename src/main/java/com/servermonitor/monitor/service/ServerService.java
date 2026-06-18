@@ -1,7 +1,10 @@
 package com.servermonitor.monitor.service;
 
+import com.servermonitor.monitor.dto.ServerRequest;
+import com.servermonitor.monitor.exception.ResourceNotFoundException;
 import com.servermonitor.monitor.model.Server;
 import com.servermonitor.monitor.repository.ServerRepository;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,26 +19,37 @@ public class ServerService {
         return serverRepository.findAll();
     }
 
-    public Server addServer(Server server){
-        serverRepository.save(server);
-        return server;
+    public Server getServerById(String id) {
+        return serverRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Not Found Server ID: " + id));
     }
 
-    public Server updateServer(String id, Server updatedServer) {
-        Server existingServer = serverRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("์Not Found Server ID: " + id));
+    public Server addServer(ServerRequest request){
+        Server server = Server.builder()
+                .name(request.getName())
+                .endpoint(request.getEndpoint())
+                .isActive(request.getIsActive())
+                .build();
+        return serverRepository.save(server);
+    }
 
-        existingServer.setName(updatedServer.getName());
-        existingServer.setEndpoint(updatedServer.getEndpoint());
-        existingServer.setIsActive(updatedServer.getIsActive());
+    public Server updateServer(String id, ServerRequest request) {
+        Server existingServer = serverRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("์Not Found Server ID: " + id));
+
+        existingServer.setName(request.getName());
+        existingServer.setEndpoint(request.getEndpoint());
+        existingServer.setIsActive(request.getIsActive());
 
         return serverRepository.save(existingServer);
     }
 
-    public void deleteServer(String id){
+    public String deleteServer(String id){
         Server existingServer = serverRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("์Not Found Server ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("์Not Found Server ID: " + id));
 
-        serverRepository.deleteById(id);
+        serverRepository.delete(existingServer);
+
+        return "Server ID " + id + " Deleted successfully";
     }
 }
