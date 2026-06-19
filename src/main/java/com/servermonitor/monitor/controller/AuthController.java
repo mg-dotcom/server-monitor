@@ -2,6 +2,7 @@ package com.servermonitor.monitor.controller;
 
 import com.servermonitor.monitor.dto.ApiResponse;
 import com.servermonitor.monitor.dto.LoginRequest;
+import com.servermonitor.monitor.dto.RegisterRequest;
 import com.servermonitor.monitor.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,4 +22,11 @@ public class AuthController {
         String token =  authService.login(request.getUsername(), request.getPassword());
         return ResponseEntity.ok(ApiResponse.ok(token));
     }
+
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<String>> register(@RequestBody RegisterRequest request) {
+        String token = authService.register(request);
+        return ResponseEntity.ok(ApiResponse.ok(token));
+    }
+
 }

@@ -29,5 +29,6 @@ public class Log {
 
     @ManyToOne
     @JoinColumn(name = "server_id")
+    //    ฝั่งที่มี @JoinColumn = เจ้าของ foreign key จริงๆ ใน DB
     private Server server;
 }
