@@ -1,4 +1,4 @@
-package com.servermonitor.monitor.dto;
+package com.servermonitor.monitor.dto.auth;
 
 import lombok.Data;
 
@@ -8,4 +8,5 @@ public class RegisterRequest {
     private String firstName;
     private String lastName;
     private String password;
+    private String lineUserId;
 }

@@ -22,6 +22,7 @@ public class Server {
     private String id;
 
     private String name;
+    @Column(unique = true)
     private String endpoint;
     private Boolean isMonitored;
 
@@ -35,7 +36,7 @@ public class Server {
 //    ฝั่งที่มี mappedBy = แค่อ่านย้อนกลับ ไม่มี column ใน DB
 
     @JsonIgnore
-    @OneToMany(mappedBy = "server")
+    @OneToMany(mappedBy = "server", cascade = CascadeType.REMOVE)
     @Builder.Default
     private List<ServerOperator> serverOperators = new ArrayList<>();
 }

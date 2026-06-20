@@ -1,35 +1,40 @@
 package com.servermonitor.monitor.service;
 
-import com.servermonitor.monitor.dto.OperatorDto;
-import com.servermonitor.monitor.dto.ServerRequest;
-import com.servermonitor.monitor.dto.ServerResponse;
+import com.servermonitor.monitor.dto.operator.OperatorResponse;
+import com.servermonitor.monitor.dto.server.ServerRequest;
+import com.servermonitor.monitor.dto.server.ServerResponse;
+import com.servermonitor.monitor.exception.ConflictException;
 import com.servermonitor.monitor.exception.ResourceNotFoundException;
+import com.servermonitor.monitor.mapper.OperatorMapper;
+import com.servermonitor.monitor.model.Operator;
 import com.servermonitor.monitor.model.Server;
 import com.servermonitor.monitor.repository.OperatorRepository;
 import com.servermonitor.monitor.repository.ServerRepository;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ServerService {
     private final ServerRepository serverRepository;
-    private final OperatorRepository operatorRepository;
 
     public List<ServerResponse> getAllServers() {
         return serverRepository.findAll().stream().map(this::toServerRespond).toList();
     }
 
     public ServerResponse getServerById(String id) {
-        return toServerRespond(serverRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Not Found Server ID: " + id)));
+        return serverRepository.findById(id)
+                .map(this::toServerRespond)
+                .orElseThrow(() -> new ResourceNotFoundException("Not Found Server ID: " + id));
     }
 
     public ServerResponse addServer(ServerRequest request) {
+        if (serverRepository.existsByEndpoint(request.getEndpoint())) {
+            throw new ConflictException("Server endpoint already exists: " + request.getEndpoint());
+        }
+
         Server server = Server.builder()
                 .name(request.getName())
                 .endpoint(request.getEndpoint())
@@ -40,7 +45,7 @@ public class ServerService {
 
     public ServerResponse updateServer(String id, ServerRequest request) {
         Server existingServer = serverRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("์Not Found Server ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Not Found Server ID: " + id));
 
         existingServer.setName(request.getName());
         existingServer.setEndpoint(request.getEndpoint());
@@ -54,7 +59,7 @@ public class ServerService {
 
     public String deleteServer(String id) {
         Server existingServer = serverRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("์Not Found Server ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Not Found Server ID: " + id));
 
         serverRepository.delete(existingServer);
 
@@ -62,12 +67,9 @@ public class ServerService {
     }
 
     private ServerResponse toServerRespond(Server server){
-        List<OperatorDto> operators = server.getServerOperators()
+        List<OperatorResponse> operators = server.getServerOperators()
                 .stream()
-                .map(so -> OperatorDto.builder()
-                        .id(so.getOperator().getId())
-                        .name(so.getOperator().getFirstName() + " " + so.getOperator().getLastName())
-                        .build())
+                .map(so -> OperatorMapper.toResponse(so.getOperator()))
                 .toList();
 
         return ServerResponse.builder()

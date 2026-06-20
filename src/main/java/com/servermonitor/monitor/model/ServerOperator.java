@@ -1,26 +1,28 @@
 package com.servermonitor.monitor.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "servers_operators")
+@Builder
+@Table(
+        name = "servers_operators",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"server_id", "operator_id"})
+)
 public class ServerOperator {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne
-    @JoinColumn(name = "server_id")
+    @JoinColumn(name = "server_id", nullable = false)
     private Server server;
 
     @ManyToOne
-    @JoinColumn(name = "op_id")
+    @JoinColumn(name = "operator_id", nullable = false)
     private Operator operator;
 }

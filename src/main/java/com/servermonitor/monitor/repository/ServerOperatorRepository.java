@@ -1,7 +1,14 @@
 package com.servermonitor.monitor.repository;
 
+import com.servermonitor.monitor.model.Operator;
+import com.servermonitor.monitor.model.Server;
 import com.servermonitor.monitor.model.ServerOperator;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional; // 👈 อย่าลืม import ตัวนี้ด้วยนะครับ
+
 public interface ServerOperatorRepository extends JpaRepository<ServerOperator, Long> {
+    boolean existsByServerAndOperator(Server server, Operator operator);
+
+    Optional<ServerOperator> findByServerAndOperator(Server server, Operator operator);
 }

@@ -1,6 +1,6 @@
 package com.servermonitor.monitor.service;
 
-import com.servermonitor.monitor.dto.RegisterRequest;
+import com.servermonitor.monitor.dto.auth.RegisterRequest;
 import com.servermonitor.monitor.model.Operator;
 import com.servermonitor.monitor.repository.OperatorRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +35,7 @@ public class AuthService {
                 .username(request.getUsername())
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
+                .lineUserId(request.getLineUserId())
                 .password(encodedPassword)
                 .build();
         operatorRepository.save(operator);

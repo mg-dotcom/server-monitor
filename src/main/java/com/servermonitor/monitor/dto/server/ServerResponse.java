@@ -1,5 +1,6 @@
-package com.servermonitor.monitor.dto;
+package com.servermonitor.monitor.dto.server;
 
+import com.servermonitor.monitor.dto.operator.OperatorResponse;
 import lombok.Builder;
 import lombok.Data;
 import java.util.List;
@@ -11,5 +12,5 @@ public class ServerResponse {
     private String name;
     private String endpoint;
     private Boolean isMonitored;
-    private List<OperatorDto> operators;
+    private List<OperatorResponse> operators;
 }

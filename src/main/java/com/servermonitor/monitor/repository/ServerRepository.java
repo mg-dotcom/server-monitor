@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ServerRepository extends JpaRepository<Server, String> {
     List<Server> findByIsMonitoredIsTrue();
+
+    boolean existsByEndpoint(String endpoint);
 }

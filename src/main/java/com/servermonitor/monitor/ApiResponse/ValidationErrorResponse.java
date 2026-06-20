@@ -1,4 +1,4 @@
-package com.servermonitor.monitor.dto;
+package com.servermonitor.monitor.ApiResponse;
 
 import lombok.*;
 
