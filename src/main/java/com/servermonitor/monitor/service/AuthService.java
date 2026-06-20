@@ -28,18 +28,4 @@ public class AuthService {
             throw e;
         }
     }
-
-    public String register(RegisterRequest request) {
-        String encodedPassword = passwordEncoder.encode(request.getPassword());
-        Operator operator = Operator.builder()
-                .username(request.getUsername())
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .lineUserId(request.getLineUserId())
-                .password(encodedPassword)
-                .build();
-        operatorRepository.save(operator);
-
-        return jwtService.generateToken(operator.getUsername());
-    }
 }

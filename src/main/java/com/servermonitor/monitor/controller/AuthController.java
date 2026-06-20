@@ -22,11 +22,4 @@ public class AuthController {
         String token =  authService.login(request.getUsername(), request.getPassword());
         return ResponseEntity.ok(ApiResponse.ok(token));
     }
-
-//    TODO: Delete Later
-    @PostMapping("/register")
-    public ResponseEntity<ApiResponse<String>> register(@RequestBody RegisterRequest request) {
-        String token = authService.register(request);
-        return ResponseEntity.ok(ApiResponse.ok(token));
-    }
 }
