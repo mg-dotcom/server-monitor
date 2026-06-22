@@ -129,10 +129,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Footer */}
-          <p className="text-center text-slate-400 text-xs mt-6">
-            Protected by secure authentication
-          </p>
         </div>
       </div>
     </div>

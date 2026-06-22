@@ -16,7 +16,7 @@ export default function SummaryCards({ servers }: Props) {
     (server) => server.currentStatus === "DOWN"
   ).length;
 
-  const stats = [
+  const stats: { title: string; value: number; color: "blue" | "green" | "red" }[] = [
     { title: "Total Servers", value: total, color: "blue" },
     { title: "UP", value: up, color: "green" },
     { title: "DOWN", value: down, color: "red" },

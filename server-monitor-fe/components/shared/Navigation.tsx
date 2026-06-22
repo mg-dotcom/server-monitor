@@ -49,8 +49,8 @@ export default function Navigation() {
         <div className="flex items-center gap-2">
           {pathname !== "/login" && (
             <button
-              onClick={() => {
-                // TODO: Add logout
+              onClick={async () => {
+                await fetch("/api/auth/logout", { method: "POST" });
                 router.push("/login");
               }}
               className="px-4 py-2 rounded-lg text-sm text-slate-300 hover:text-white hover:bg-slate-800 transition-all duration-200 active:scale-95"

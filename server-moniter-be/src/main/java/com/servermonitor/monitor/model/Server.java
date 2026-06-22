@@ -31,7 +31,11 @@ public class Server {
 
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "server")
+    @JsonIgnore
+    @OneToMany(
+            mappedBy = "server",
+            cascade = CascadeType.REMOVE
+    )
     private List<Log> logs;
 //    ฝั่งที่มี mappedBy = แค่อ่านย้อนกลับ ไม่มี column ใน DB
 
