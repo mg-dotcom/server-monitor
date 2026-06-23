@@ -52,8 +52,7 @@ public class SecurityConfig {
 
         config.setAllowedOrigins(List.of(
                 "http://localhost:3000",
-                "https://server-monitor.vercel.app",
-                "https://server-monitor-git-main-mg-dotcoms-projects.vercel.app"
+                "https://server-monitor-mg-dotcom.vercel.app"
         ));
 
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
