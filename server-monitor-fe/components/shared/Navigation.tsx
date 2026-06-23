@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
+import { logoutAction } from "@/app/dashboard/actions";
 
 export default function Navigation() {
   const router = useRouter();
@@ -51,8 +52,9 @@ export default function Navigation() {
           {showLogoutButton && (
             <button
               onClick={async () => {
-                await fetch("/api/auth/logout", { method: "POST" });
+                await logoutAction();
                 router.push("/login");
+                router.refresh();
               }}
               className="px-4 py-2 rounded-lg text-sm text-slate-300 hover:text-white hover:bg-slate-800 transition-all duration-200 active:scale-95"
             >

@@ -40,6 +40,12 @@ export async function loginAction(credentials: any) {
   }
 }
 
+export async function logoutAction() {
+  const cookieStore = await cookies();
+  cookieStore.delete("token"); 
+  return { success: true };
+}
+
 export async function addServer({ name, endpoint }: AddServerInput) {
   await api.post("/servers", { name, endpoint }, {
     headers: await authHeader(),
