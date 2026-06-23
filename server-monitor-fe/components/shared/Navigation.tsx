@@ -9,6 +9,7 @@ export default function Navigation() {
 
   // Show back button on all pages except home and login
   const showBackButton = pathname !== "/" && pathname !== "/login";
+  const showLogoutButton = pathname !== "/" && pathname !== "/login";
 
   return (
     <nav className="bg-slate-900 border-b border-slate-800 sticky top-0 z-40">
@@ -47,7 +48,7 @@ export default function Navigation() {
         </div>
 
         <div className="flex items-center gap-2">
-          {pathname !== "/login" && (
+          {showLogoutButton && (
             <button
               onClick={async () => {
                 await fetch("/api/auth/logout", { method: "POST" });

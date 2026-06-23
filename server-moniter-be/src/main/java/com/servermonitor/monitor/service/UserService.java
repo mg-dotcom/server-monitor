@@ -1,50 +1,45 @@
 package com.servermonitor.monitor.service;
 
-import com.servermonitor.monitor.dto.operator.OperatorRequest;
-import com.servermonitor.monitor.dto.operator.OperatorResponse;
-import com.servermonitor.monitor.dto.operator.OperatorUpdateRequest;
+import com.servermonitor.monitor.dto.user.UserRequest;
+import com.servermonitor.monitor.dto.user.UserResponse;
+import com.servermonitor.monitor.dto.user.UserUpdateRequest;
 import com.servermonitor.monitor.exception.ConflictException;
 import com.servermonitor.monitor.exception.ResourceNotFoundException;
-import com.servermonitor.monitor.mapper.OperatorMapper;
+import com.servermonitor.monitor.mapper.UserMapper;
 import com.servermonitor.monitor.model.*;
-import com.servermonitor.monitor.repository.LogRepository;
-import com.servermonitor.monitor.repository.OperatorRepository;
-import com.servermonitor.monitor.repository.ServerOperatorRepository;
-import com.servermonitor.monitor.repository.ServerRepository;
+import com.servermonitor.monitor.repository.*;
 import com.servermonitor.monitor.utils.LinePushMessageToOperator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class OperatorService {
-    private final OperatorRepository operatorRepository;
+public class UserService {
+    private final UserRepository userRepository;
     private final ServerOperatorRepository serverOperatorRepository;
     private final ServerRepository serverRepository;
     private final PasswordEncoder passwordEncoder;
     private final LogRepository logRepository;
     private final LinePushMessageToOperator linePushMessageToOperator;
 
-    public List<OperatorResponse> getAllOperators() {
-        return operatorRepository.findAll()
+    public List<UserResponse> getAllOperators() {
+        return userRepository.findAll()
                 .stream()
-                .map(OperatorMapper::toResponse)
+                .map(UserMapper::toResponse)
                 .toList();
     }
 
-    public OperatorResponse getOperatorById(String id) {
-        return operatorRepository.findById(id)
-                .map(OperatorMapper::toResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("Not Found Operator ID: " + id));
+    public UserResponse getOperatorById(String id) {
+        return userRepository.findById(id)
+                .map(UserMapper::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("Not Found User ID: " + id));
     }
 
-    public OperatorResponse createOperator(OperatorRequest request) {
-        Operator operator = Operator.builder()
+    public UserResponse createOperator(UserRequest request) {
+        User operator = User.builder()
                 .username(request.getUsername())
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
@@ -52,33 +47,33 @@ public class OperatorService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
                 .build();
-        return OperatorMapper.toResponse(operatorRepository.save(operator));
+        return UserMapper.toResponse(userRepository.save(operator));
     }
 
-    public OperatorResponse updateOperator(String id, OperatorUpdateRequest request) {
-        Operator existingOperator = operatorRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Not Found Operator ID: " + id));
+    public UserResponse updateOperator(String id, UserUpdateRequest request) {
+        User existingOperator = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Not Found User ID: " + id));
 
         existingOperator.setFirstName(request.getFirstName());
         existingOperator.setLastName(request.getLastName());
         existingOperator.setLineUserId(request.getLineUserId());
 
-        return OperatorMapper.toResponse(operatorRepository.save(existingOperator));
+        return UserMapper.toResponse(userRepository.save(existingOperator));
     }
 
     public void deleteOperator(String id) {
-        Operator existingOperator = operatorRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Not Found Operator ID: " + id));
+        User existingOperator = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Not Found User ID: " + id));
 
-        operatorRepository.delete(existingOperator);
+        userRepository.delete(existingOperator);
     }
 
     public void assignToServer(String serverId, String operatorId) {
         Server existingServer = serverRepository.findById(serverId)
                 .orElseThrow(() -> new ResourceNotFoundException("Not Found Server ID: " + serverId));
 
-        Operator existingOperator = operatorRepository.findById(operatorId)
-                .orElseThrow(() -> new ResourceNotFoundException("Not Found Operator ID: " + operatorId));
+        User existingOperator = userRepository.findById(operatorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Not Found User ID: " + operatorId));
 
         if (serverOperatorRepository.existsByServerAndOperator(existingServer, existingOperator)) {
             throw new ConflictException("Already assigned");
@@ -111,11 +106,11 @@ public class OperatorService {
         Server existingServer = serverRepository.findById(serverId)
                 .orElseThrow(() -> new ResourceNotFoundException("Not Found Server ID: " + serverId));
 
-        Operator existingOperator = operatorRepository.findById(operatorId)
-                .orElseThrow(() -> new ResourceNotFoundException("Not Found Operator ID: " + operatorId));
+        User existingOperator = userRepository.findById(operatorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Not Found User ID: " + operatorId));
 
         ServerOperator serverOperator = serverOperatorRepository.findByServerAndOperator(existingServer, existingOperator)
-                .orElseThrow(() -> new ResourceNotFoundException("Assignment not found between Server ID: " + serverId + " and Operator ID: " + operatorId));
+                .orElseThrow(() -> new ResourceNotFoundException("Assignment not found between Server ID: " + serverId + " and User ID: " + operatorId));
 
         serverOperatorRepository.delete(serverOperator);
     }

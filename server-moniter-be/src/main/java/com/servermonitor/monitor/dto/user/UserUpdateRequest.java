@@ -1,9 +1,9 @@
-package com.servermonitor.monitor.dto.operator;
+package com.servermonitor.monitor.dto.user;
 
 import lombok.Data;
 
 @Data
-public class OperatorUpdateRequest {
+public class UserUpdateRequest {
     private String firstName;
     private String lastName;
     private String lineUserId;

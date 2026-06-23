@@ -4,7 +4,7 @@ import com.servermonitor.monitor.ApiResponse.ApiResponse;
 import com.servermonitor.monitor.dto.auth.LoginRequest;
 import com.servermonitor.monitor.dto.auth.MeResponse;
 import com.servermonitor.monitor.dto.auth.RegisterRequest;
-import com.servermonitor.monitor.model.Operator;
+import com.servermonitor.monitor.model.User;
 import com.servermonitor.monitor.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -58,7 +58,7 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<MeResponse>> me() {
-        Operator operator = (Operator) SecurityContextHolder
+        User operator = (User) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();

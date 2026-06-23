@@ -1,9 +1,7 @@
 package com.servermonitor.monitor.service;
 
-import com.servermonitor.monitor.dto.operator.OperatorResponse;
 import com.servermonitor.monitor.model.*;
 import com.servermonitor.monitor.repository.LogRepository;
-import com.servermonitor.monitor.repository.ServerOperatorRepository;
 import com.servermonitor.monitor.repository.ServerRepository;
 import com.servermonitor.monitor.utils.LinePushMessageToOperator;
 import jakarta.transaction.Transactional;

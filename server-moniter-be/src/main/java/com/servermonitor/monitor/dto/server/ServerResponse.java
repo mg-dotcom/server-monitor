@@ -1,6 +1,6 @@
 package com.servermonitor.monitor.dto.server;
 
-import com.servermonitor.monitor.dto.operator.OperatorResponse;
+import com.servermonitor.monitor.dto.user.UserResponse;
 import com.servermonitor.monitor.model.ServerStatus;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +13,6 @@ public class ServerResponse {
     private String name;
     private String endpoint;
     private Boolean isMonitored;
-    private List<OperatorResponse> operators;
+    private List<UserResponse> operators;
     private ServerStatus currentStatus;
 }

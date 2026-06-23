@@ -1,17 +1,15 @@
 package com.servermonitor.monitor.service;
 
-import com.servermonitor.monitor.dto.operator.OperatorResponse;
+import com.servermonitor.monitor.dto.user.UserResponse;
 import com.servermonitor.monitor.dto.server.ServerRequest;
 import com.servermonitor.monitor.dto.server.ServerResponse;
 import com.servermonitor.monitor.exception.ConflictException;
 import com.servermonitor.monitor.exception.ResourceNotFoundException;
-import com.servermonitor.monitor.mapper.OperatorMapper;
+import com.servermonitor.monitor.mapper.UserMapper;
 import com.servermonitor.monitor.model.Log;
-import com.servermonitor.monitor.model.Operator;
 import com.servermonitor.monitor.model.Server;
 import com.servermonitor.monitor.model.ServerStatus;
 import com.servermonitor.monitor.repository.LogRepository;
-import com.servermonitor.monitor.repository.OperatorRepository;
 import com.servermonitor.monitor.repository.ServerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -72,9 +70,9 @@ public class ServerService {
 
     private ServerResponse toServerRespond(Server server) {
 
-        List<OperatorResponse> operators = server.getServerOperators()
+        List<UserResponse> operators = server.getServerOperators()
                 .stream()
-                .map(so -> OperatorMapper.toResponse(so.getOperator()))
+                .map(so -> UserMapper.toResponse(so.getOperator()))
                 .toList();
 
         ServerStatus currentStatus = logRepository

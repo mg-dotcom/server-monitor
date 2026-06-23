@@ -3,81 +3,50 @@ import { Server, Operator } from "@/types/server";
 import { ApiResponse } from "@/types/api";
 import { AuthenticatedUser } from "@/types/auth";
 import { Log } from "@/types/log";
-
+import { api } from "@/lib/api";
 
 async function authHeader() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
-  return { Cookie: `token=${token}` }; 
+  return token ? { Cookie: `token=${token}` } : {}; 
 }
 
 export async function getServers(): Promise<Server[]> {
-  const res = await fetch("http://localhost:8080/api/servers", {
+  const { data: response } = await api.get<ApiResponse<Server[]>>("/servers", {
     headers: await authHeader(),
-    cache: "no-store",
   });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch servers");
-  }
-
-  const data: ApiResponse<Server[]> = await res.json();
-  return data.data;
+  return response.data;
 }
 
-
 export async function getServerById(id: string): Promise<Server> {
-  const res = await fetch(`http://localhost:8080/api/servers/${id}`, {
+  const { data: response } = await api.get<ApiResponse<Server>>(`/servers/${id}`, {
     headers: await authHeader(),
-    cache: "no-store",
   });
-  if (!res.ok) {
-    throw new Error("Failed to fetch server");
-  }
-  const data: ApiResponse<Server> = await res.json();
-  return data.data;
+  return response.data;
 }
 
 export async function getServerLogs(id: string): Promise<Log[]> {
-
-  const res = await fetch(
-    `http://localhost:8080/api/servers/${id}/logs`,
-    {
+  try {
+    const { data: response } = await api.get<ApiResponse<Log[]>>(`/servers/${id}/logs`, {
       headers: await authHeader(),
-      cache: "no-store",
-    }
-  );
-
-  if (!res.ok) {
-    const text = await res.text();
-    console.log("ERROR BODY:", text);
+    });
+    return response.data;
+  } catch (error: any) {
+    console.log("ERROR BODY:", error.response?.data || error.message);
     throw new Error("Failed to fetch logs");
   }
-
-  const data: ApiResponse<Log[]>   = await res.json();
-  return data.data;
 }
 
 export async function getOperators(): Promise<Operator[]> {
-  const res = await fetch("http://localhost:8080/api/operators", {
+  const { data: response } = await api.get<ApiResponse<Operator[]>>("/operators", {
     headers: await authHeader(),
-    cache: "no-store",
   });
-
-  if (!res.ok) throw new Error("Failed to fetch operators");
-
-  const data: ApiResponse<Operator[]> = await res.json();
-  return data.data;
+  return response.data;
 }
 
 export async function getMe(): Promise<AuthenticatedUser> {
-  const res = await fetch("http://localhost:8080/api/auth/me", {
+  const { data: response } = await api.get<ApiResponse<AuthenticatedUser>>("/auth/me", {
     headers: await authHeader(),
-    cache: "no-store",
   });
-  
-  if (!res.ok) throw new Error("Failed to fetch authenticated user");
-
-  const data: ApiResponse<AuthenticatedUser> = await res.json();
-  return data.data;
+  return response.data;
 }
