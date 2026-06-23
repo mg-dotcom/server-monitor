@@ -2,16 +2,16 @@ package com.servermonitor.monitor.controller;
 
 import com.servermonitor.monitor.ApiResponse.ApiResponse;
 import com.servermonitor.monitor.dto.auth.LoginRequest;
+import com.servermonitor.monitor.dto.auth.MeResponse;
 import com.servermonitor.monitor.dto.auth.RegisterRequest;
+import com.servermonitor.monitor.model.Operator;
 import com.servermonitor.monitor.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -37,5 +37,20 @@ public class AuthController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(ApiResponse.ok("Login Success"));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<MeResponse>> me() {
+        Operator operator = (Operator) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        return ResponseEntity.ok(ApiResponse.ok(
+                MeResponse.builder()
+                        .username(operator.getUsername())
+                        .role(operator.getRole().name())
+                        .build()
+        ));
     }
 }

@@ -8,6 +8,7 @@ import com.servermonitor.monitor.service.ServerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,21 +31,25 @@ public class ServerController {
     }
 
     @PostMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<ServerResponse>> addServer(@Valid @RequestBody ServerRequest request){
         return ResponseEntity.ok(ApiResponse.created(serverService.addServer(request)));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<ServerResponse>> updeteServer(@PathVariable String id,@Valid @RequestBody ServerRequest request) {
         return ResponseEntity.ok(ApiResponse.created(serverService.updateServer(id, request)));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<String>> deleteServer(@PathVariable String id) {
         return ResponseEntity.ok(ApiResponse.ok(serverService.deleteServer(id)));
     }
 
     @PostMapping("/{serverId}/assign-operator/{operatorId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<ServerResponse>> assignOperator(
             @PathVariable String serverId,
             @PathVariable String operatorId) {
@@ -53,6 +58,7 @@ public class ServerController {
     }
 
     @DeleteMapping("/{serverId}/remove-operator/{operatorId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<ServerResponse>> removeOperator(
             @PathVariable String serverId,
             @PathVariable String operatorId) {

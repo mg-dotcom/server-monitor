@@ -8,9 +8,10 @@ import { removeServer } from "@/app/dashboard/actions";
 
 type Props = {
   servers: Server[];
+  role: "ADMIN" | "OPERATOR";
 };
 
-export default function ServerList({ servers }: Props) {
+export default function ServerList({ servers, role }: Props) {
   const [showModal, setShowModal] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -34,12 +35,15 @@ export default function ServerList({ servers }: Props) {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-white font-semibold">Servers</h2>
-        <button
-          onClick={() => setShowModal(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
-        >
-          + Add Server
-        </button>
+
+        {role === "ADMIN" && (
+          <button
+            onClick={() => setShowModal(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+          >
+            + Add Server
+          </button>
+        )}
       </div>
 
       {deleteError && (
@@ -111,13 +115,16 @@ export default function ServerList({ servers }: Props) {
                       <span>View</span>
                     </Link>
 
-                    <button
-                      onClick={() => handleDelete(server.id, server.name)}
-                      disabled={deletingId === server.id}
-                      className="inline-flex items-center px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {deletingId === server.id ? "Removing..." : "Remove"}
-                    </button>
+                    {role === "ADMIN" && (
+                      <button
+                        onClick={() => handleDelete(server.id, server.name)}
+                        disabled={deletingId === server.id}
+                        className="inline-flex items-center px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {deletingId === server.id ? "Removing..." : "Remove"}
+                      </button>
+                    )}
+
                   </div>
                 </td>
               </tr>

@@ -1,5 +1,6 @@
 package com.servermonitor.monitor.service;
 
+import com.servermonitor.monitor.model.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -15,9 +16,10 @@ public class JwtService {
     @Value("${application.security.jwt.secret-key}")
     private String secretKey;
 
-    public String generateToken(String username) {
+    public String generateToken(String username, String role) {
         return Jwts.builder()
                 .setSubject(username)
+                .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // หมดอายุ 24 ชั่วโมง
                 .signWith(getSignKey())
@@ -26,6 +28,10 @@ public class JwtService {
 
     public String extractUsername(String token){
         return extractAllClaims(token).getSubject();
+    }
+
+    public String extractRole(String token) {
+        return extractAllClaims(token).get("role", String.class);
     }
 
     private boolean isTokenExpired(String token) {

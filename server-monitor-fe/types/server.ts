@@ -4,6 +4,7 @@ export interface Operator {
   id: string;
   name: string;
   lineUserId: string;
+  role: "ADMIN" | "OPERATOR";
 }
 
 export interface Server {

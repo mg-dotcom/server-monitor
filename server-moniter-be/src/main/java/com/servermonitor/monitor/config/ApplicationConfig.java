@@ -23,7 +23,7 @@ public class ApplicationConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> operatorRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Usr not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     @Bean

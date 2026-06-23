@@ -43,3 +43,29 @@ export async function removeServer(id: string) {
 
   revalidatePath("/dashboard");
 }
+
+export async function assignOperator(serverId: string, operatorId: string) {
+  const res = await fetch(
+    `http://localhost:8080/api/servers/${serverId}/assign-operator/${operatorId}`,
+    {
+      method: "POST",
+      headers: await authHeader(),
+    }
+  );
+
+  if (!res.ok) throw new Error("Failed to assign operator");
+  revalidatePath(`/dashboard/servers/${serverId}`);
+}
+
+export async function removeOperator(serverId: string, operatorId: string) {
+  const res = await fetch(
+    `http://localhost:8080/api/servers/${serverId}/remove-operator/${operatorId}`,
+    {
+      method: "DELETE",
+      headers: await authHeader(),
+    }
+  );
+
+  if (!res.ok) throw new Error("Failed to remove operator");
+  revalidatePath(`/dashboard/servers/${serverId}`);
+}

@@ -1,5 +1,6 @@
-import { getServerLogs } from "@/lib/server-api";
+import { getMe, getOperators, getServerById, getServerLogs } from "@/lib/server-api";
 import PageWrapper from "@/components/shared/PageWrapper";
+import OperatorsSection from "@/components/dashboard/OperatorsSection";
 
 type Props = {
   params: Promise<{
@@ -12,11 +13,20 @@ export default async function ServerDetailPage({
 }: Props) {
   const { id } = await params;
 
-  const logs = await getServerLogs(id);
+  const [server, logs, operators, me] = await Promise.all([
+    getServerById(id),
+    getServerLogs(id),
+    getOperators(),
+    getMe()
+  ]);
+
+  console.log("server.operators:", server.operators);
+
 
   return (
     <PageWrapper title="Server Logs">
       <div className="max-w-6xl mx-auto space-y-6 px-6">
+        <OperatorsSection serverId={server.id} assignedOperators={server.operators} allOperators={operators} role={me.role} />
         <div className="animate-slide-up">
           <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden hover:border-slate-700 transition-all duration-300">
             <table className="w-full">
@@ -46,18 +56,16 @@ export default async function ServerDetailPage({
                     >
                       <td className="p-4">
                         <span
-                          className={`inline-flex items-center gap-2 px-3 py-1 rounded-full font-semibold text-sm ${
-                            log.status === "UP"
+                          className={`inline-flex items-center gap-2 px-3 py-1 rounded-full font-semibold text-sm ${log.status === "UP"
                               ? "bg-green-500/10 text-green-400 border border-green-500/30"
                               : "bg-red-500/10 text-red-400 border border-red-500/30"
-                          }`}
+                            }`}
                         >
                           <span
-                            className={`w-2 h-2 rounded-full ${
-                              log.status === "UP"
+                            className={`w-2 h-2 rounded-full ${log.status === "UP"
                                 ? "bg-green-400"
                                 : "bg-red-400"
-                            }`}
+                              }`}
                           />
                           {log.status}
                         </span>

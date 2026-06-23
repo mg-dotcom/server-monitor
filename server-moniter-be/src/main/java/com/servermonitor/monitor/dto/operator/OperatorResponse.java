@@ -9,5 +9,6 @@ public class OperatorResponse {
     private String id;
     private String name;
     private String lineUserId;
+    private String role;
 }
 

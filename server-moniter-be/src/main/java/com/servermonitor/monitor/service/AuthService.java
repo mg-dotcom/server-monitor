@@ -14,14 +14,18 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
     private final AuthenticationManager authenticationManager;
+    private final OperatorRepository operatorRepository;
     private final JwtService jwtService;
 
     public String login(String username, String password) {
+
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
-            return jwtService.generateToken(username);
+            Operator operator = operatorRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+
+            return jwtService.generateToken(username, operator.getRole().name());
         } catch (BadCredentialsException e) {
             throw e;
         }

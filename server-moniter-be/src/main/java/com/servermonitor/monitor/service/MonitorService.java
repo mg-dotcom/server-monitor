@@ -30,18 +30,18 @@ public class MonitorService {
         for (Server server : servers) {
             try {
                 restClient.get().uri(server.getEndpoint()).retrieve().toBodilessEntity();
-                boolean isRecovered = saveLogIfChanged(server, ServerStatus.UP, "Health check passed");
-                if (isRecovered) {
-                    String alertMessage = """
+                boolean statusChanged = saveLogIfChanged(server, ServerStatus.UP, "Health check passed");
+                if (statusChanged) {
+                    String recoveryMessage = """
                             ✅ [RECOVERY] Server is UP again!
                                - Server: %s
                                - URL: %s
                             """.formatted(server.getName(), server.getEndpoint());
-                    linePushMessageToOperator.pushMessageToOperators(server, alertMessage);
+                    linePushMessageToOperator.pushMessageToOperators(server, recoveryMessage);
                 }
             } catch (Exception e) {
-                boolean isLogChanged = saveLogIfChanged(server, ServerStatus.DOWN, e.getMessage());
-                if (isLogChanged) {
+                boolean statusChanged = saveLogIfChanged(server, ServerStatus.DOWN, e.getMessage());
+                if (statusChanged) { // แปลว่าเพิ่งเปลี่ยนจาก UP → DOWN
                     String alertMessage = """
                             🚨 [ALERT] Server DOWN!
                                - Server: %s
@@ -57,18 +57,18 @@ public class MonitorService {
     private Boolean saveLogIfChanged(Server server, ServerStatus status, String detail) {
         List<Log> logs = logRepository.findByServerIdOrderByCreatedAtDesc(server.getId());
         Log latestLog = logs.isEmpty() ? null : logs.getFirst();
-        // เพิ่งเคยเช็คครั้งแรกสุด
+
         if (latestLog == null) {
             logRepository.save(saveLogToDb(status, detail, server));
-            return status == ServerStatus.DOWN;
+            return status == ServerStatus.DOWN; // ครั้งแรก DOWN = alert
         }
-        // มี Log เดิมอยู่แล้ว และสถานะ "เปลี่ยนไป" จากรอบที่แล้ว
+
         if (latestLog.getStatus() != status) {
             logRepository.save(saveLogToDb(status, detail, server));
-            return true;
+            return true; // status เปลี่ยน = ต้อง alert
         }
-        // สถานะเหมือนเดิมตลอด
-        return false;
+
+        return false; // status เหมือนเดิม = ไม่ต้อง alert
     }
 
     private Log saveLogToDb(ServerStatus status, String detail, Server server) {
