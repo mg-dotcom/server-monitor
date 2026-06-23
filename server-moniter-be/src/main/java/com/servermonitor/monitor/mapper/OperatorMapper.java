@@ -14,7 +14,7 @@ public final class OperatorMapper {
                 .id(operator.getId())
                 .name(operator.getFirstName() + " " + operator.getLastName())
                 .lineUserId(operator.getLineUserId())
-                .role(operator.getRole().name())
+                .role(operator.getRole())
                 .build();
     }
 }

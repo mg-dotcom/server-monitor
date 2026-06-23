@@ -66,7 +66,7 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.ok(
                 MeResponse.builder()
                         .username(operator.getUsername())
-                        .role(operator.getRole().name())
+                        .role(operator.getRole())
                         .build()
         ));
     }

@@ -1,5 +1,6 @@
 package com.servermonitor.monitor.dto.auth;
 
+import com.servermonitor.monitor.model.Role;
 import lombok.Builder;
 import lombok.Data;
 
@@ -7,5 +8,5 @@ import lombok.Data;
 @Builder
 public class MeResponse {
     private String username;
-    private String role;
+    private Role role;
 }
