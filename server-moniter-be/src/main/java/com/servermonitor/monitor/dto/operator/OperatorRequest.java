@@ -1,5 +1,6 @@
 package com.servermonitor.monitor.dto.operator;
 
+import com.servermonitor.monitor.model.Role;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -13,6 +14,7 @@ public class OperatorRequest {
     private String lastName;
     @NotBlank(message = "Password is required")
     private String password;
-
+    @NotBlank(message = "Role is required")
+    private Role role;
     private String lineUserId;
 }
