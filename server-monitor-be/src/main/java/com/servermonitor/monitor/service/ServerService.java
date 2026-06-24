@@ -76,13 +76,7 @@ public class ServerService {
 
         Server saved = serverRepository.save(existingServer);
 
-        logRepository.save(Log.builder()
-                .status(ServerStatus.CHECKING)
-                .detail("Rechecking after server update")
-                .server(saved)
-                .build());
-
-        return toServerRespond(saved);
+        return toServerRespondWithStatus(saved, ServerStatus.CHECKING);
     }
 
     public String deleteServer(String id) {
@@ -113,6 +107,22 @@ public class ServerService {
                 .isMonitored(server.getIsMonitored())
                 .operators(operators)
                 .currentStatus(currentStatus)
+                .build();
+    }
+
+    private ServerResponse toServerRespondWithStatus(Server server, ServerStatus overrideStatus) {
+        List<OperatorResponse> operators = server.getServerOperators()
+                .stream()
+                .map(so -> OperatorMapper.toResponse(so.getOperator()))
+                .toList();
+
+        return ServerResponse.builder()
+                .id(server.getId())
+                .name(server.getName())
+                .endpoint(server.getEndpoint())
+                .isMonitored(server.getIsMonitored())
+                .operators(operators)
+                .currentStatus(overrideStatus)
                 .build();
     }
 }

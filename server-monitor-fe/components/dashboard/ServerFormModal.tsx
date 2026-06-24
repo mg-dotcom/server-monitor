@@ -31,6 +31,11 @@ export default function ServerFormModal({ onClose, mode, existingServer }: Props
         setTimeout(onClose, 300);
     };
 
+    const hasChanged =
+        name.trim() !== existingServer?.name ||
+        endpoint.trim() !== existingServer?.endpoint ||
+        isMonitored !== existingServer?.isMonitored;
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -74,17 +79,17 @@ export default function ServerFormModal({ onClose, mode, existingServer }: Props
 
     return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div 
+            <div
                 className="absolute inset-0 bg-black transition-opacity duration-300"
                 style={{ opacity: isOpen ? 0.6 : 0 }}
                 onClick={handleClose}
             />
-            
+
             <div className="relative bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-8 w-full max-w-md transform transition-all duration-300"
-                 style={{
+                style={{
                     opacity: isOpen ? 1 : 0,
                     transform: isOpen ? "scale(1)" : "scale(0.95)",
-                 }}
+                }}
             >
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-2xl font-bold text-white">{title}</h2>
@@ -159,7 +164,7 @@ export default function ServerFormModal({ onClose, mode, existingServer }: Props
                         </button>
                         <button
                             type="submit"
-                            disabled={isLoading}
+                            disabled={isLoading || (mode === "edit" && !hasChanged)}
                             className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition-all shadow-lg shadow-blue-600/20"
                         >
                             {isLoading ? (
@@ -174,6 +179,6 @@ export default function ServerFormModal({ onClose, mode, existingServer }: Props
                     </div>
                 </form>
             </div>
-        </div>,document.body
+        </div>, document.body
     );
 }
