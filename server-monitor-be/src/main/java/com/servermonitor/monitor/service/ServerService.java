@@ -30,8 +30,8 @@ public class ServerService {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        
-        if(operator.getRole() == Role.ADMIN) {
+
+        if (operator.getRole() == Role.ADMIN) {
             return serverRepository.findAll()
                     .stream()
                     .map(this::toServerRespond)
@@ -65,7 +65,8 @@ public class ServerService {
 
     public ServerResponse updateServer(String id, ServerRequest request) {
         Server existingServer = serverRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Not Found Server ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Not Found Server ID: " + id));
 
         existingServer.setName(request.getName());
         existingServer.setEndpoint(request.getEndpoint());
@@ -76,7 +77,14 @@ public class ServerService {
 
         Server saved = serverRepository.save(existingServer);
 
-        return toServerRespondWithStatus(saved, ServerStatus.CHECKING);
+        logRepository.save(
+                Log.builder()
+                        .server(saved)
+                        .status(ServerStatus.CHECKING)
+                        .detail("Server configuration updated, waiting for health check")
+                        .build());
+
+        return toServerRespond(saved);
     }
 
     public String deleteServer(String id) {
@@ -97,7 +105,7 @@ public class ServerService {
 
         ServerStatus currentStatus = logRepository
                 .findFirstByServerIdOrderByCreatedAtDesc(server.getId())
-                .map(log -> log.getStatus())
+                .map(Log::getStatus)
                 .orElse(ServerStatus.UNKNOWN);
 
         return ServerResponse.builder()
@@ -107,22 +115,6 @@ public class ServerService {
                 .isMonitored(server.getIsMonitored())
                 .operators(operators)
                 .currentStatus(currentStatus)
-                .build();
-    }
-
-    private ServerResponse toServerRespondWithStatus(Server server, ServerStatus overrideStatus) {
-        List<OperatorResponse> operators = server.getServerOperators()
-                .stream()
-                .map(so -> OperatorMapper.toResponse(so.getOperator()))
-                .toList();
-
-        return ServerResponse.builder()
-                .id(server.getId())
-                .name(server.getName())
-                .endpoint(server.getEndpoint())
-                .isMonitored(server.getIsMonitored())
-                .operators(operators)
-                .currentStatus(overrideStatus)
                 .build();
     }
 }
