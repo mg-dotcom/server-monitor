@@ -2,15 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { addServer } from "./actions";
+import { addServer, updateServer } from "@/app/dashboard/actions";
+import { Server } from "@/types/server";
 
 type Props = {
-    onClose: () => void;
+    onClose: () => void
+    mode: "add" | "edit"
+    existingServer?: Server | null
 };
 
-export default function AddServerModal({ onClose }: Props) {
-    const [name, setName] = useState("");
-    const [endpoint, setEndpoint] = useState("");
+export default function ServerFormModal({ onClose, mode, existingServer }: Props) {
+    const [name, setName] = useState(existingServer?.name ?? "");
+    const [endpoint, setEndpoint] = useState(existingServer?.endpoint ?? "");
+    const [isMonitored, setIsMonitored] = useState(existingServer?.isMonitored ?? true);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isOpen, setIsOpen] = useState(true);
@@ -39,14 +43,24 @@ export default function AddServerModal({ onClose }: Props) {
         setError(null);
 
         try {
-            await addServer({
-                name: name.trim(),
-                endpoint: endpoint.trim(),
-            });
+            if (mode === "edit" && existingServer) {
+                await updateServer({
+                    id: existingServer.id,
+                    name: name.trim(),
+                    endpoint: endpoint.trim(),
+                    isMonitored,
+                });
+            } else {
+                await addServer({
+                    name: name.trim(),
+                    endpoint: endpoint.trim(),
+                });
+            }
 
             handleClose();
         } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : "Failed to add server");
+            const errorMsg = mode === "edit" ? "Failed to update server" : "Failed to add server";
+            setError(err instanceof Error ? err.message : errorMsg);
         } finally {
             setIsLoading(false);
         }
@@ -54,9 +68,12 @@ export default function AddServerModal({ onClose }: Props) {
 
     if (!isOpen) return null;
 
+    const isEditMode = mode === "edit";
+    const title = isEditMode ? "Edit Server" : "Add New Server";
+    const submitButtonText = isEditMode ? "Update Server" : "Add Server";
+
     return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            {/* Backdrop พื้นหลังสีเข้ม */}
             <div 
                 className="absolute inset-0 bg-black transition-opacity duration-300"
                 style={{ opacity: isOpen ? 0.6 : 0 }}
@@ -70,7 +87,7 @@ export default function AddServerModal({ onClose }: Props) {
                  }}
             >
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-white">Add New Server</h2>
+                    <h2 className="text-2xl font-bold text-white">{title}</h2>
                     <button
                         onClick={handleClose}
                         disabled={isLoading}
@@ -111,6 +128,21 @@ export default function AddServerModal({ onClose }: Props) {
                         />
                     </div>
 
+                    {isEditMode && (
+                        <div className="space-y-2">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={isMonitored}
+                                    onChange={(e) => setIsMonitored(e.target.checked)}
+                                    disabled={isLoading}
+                                    className="w-4 h-4 rounded border-slate-700 bg-slate-950 cursor-pointer"
+                                />
+                                <span className="text-sm font-medium text-slate-300">Monitor this server</span>
+                            </label>
+                        </div>
+                    )}
+
                     {error && (
                         <div className="bg-red-950/40 border border-red-900/50 text-red-400 px-4 py-3 rounded-lg text-sm animate-shake">
                             {error}
@@ -134,10 +166,10 @@ export default function AddServerModal({ onClose }: Props) {
                             {isLoading ? (
                                 <span className="flex items-center justify-center gap-2">
                                     <span className="animate-spin text-xs">⏳</span>
-                                    Adding...
+                                    {isEditMode ? "Updating..." : "Adding..."}
                                 </span>
                             ) : (
-                                "Add Server"
+                                submitButtonText
                             )}
                         </button>
                     </div>

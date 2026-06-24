@@ -1,18 +1,21 @@
 package com.servermonitor.monitor.service;
 
-import com.servermonitor.monitor.dto.user.UserResponse;
+import com.servermonitor.monitor.dto.operator.OperatorResponse;
 import com.servermonitor.monitor.dto.server.ServerRequest;
 import com.servermonitor.monitor.dto.server.ServerResponse;
 import com.servermonitor.monitor.exception.ConflictException;
 import com.servermonitor.monitor.exception.ResourceNotFoundException;
-import com.servermonitor.monitor.mapper.UserMapper;
+import com.servermonitor.monitor.mapper.OperatorMapper;
 import com.servermonitor.monitor.model.Log;
 import com.servermonitor.monitor.model.Server;
 import com.servermonitor.monitor.model.ServerStatus;
 import com.servermonitor.monitor.repository.LogRepository;
 import com.servermonitor.monitor.repository.ServerRepository;
 import lombok.RequiredArgsConstructor;
+import com.servermonitor.monitor.model.Operator;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import com.servermonitor.monitor.model.Role;
 
 import java.util.List;
 
@@ -23,7 +26,22 @@ public class ServerService {
     private final LogRepository logRepository;
 
     public List<ServerResponse> getAllServers() {
-        return serverRepository.findAll().stream().map(this::toServerRespond).toList();
+        Operator operator = (Operator) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        
+        if(operator.getRole() == Role.ADMIN) {
+            return serverRepository.findAll()
+                    .stream()
+                    .map(this::toServerRespond)
+                    .toList();
+        } else {
+            return serverRepository.findAllByServerOperators_OperatorId(operator.getId())
+                    .stream()
+                    .map(this::toServerRespond)
+                    .toList();
+        }
     }
 
     public ServerResponse getServerById(String id) {
@@ -70,9 +88,9 @@ public class ServerService {
 
     private ServerResponse toServerRespond(Server server) {
 
-        List<UserResponse> operators = server.getServerOperators()
+        List<OperatorResponse> operators = server.getServerOperators()
                 .stream()
-                .map(so -> UserMapper.toResponse(so.getOperator()))
+                .map(so -> OperatorMapper.toResponse(so.getOperator()))
                 .toList();
 
         ServerStatus currentStatus = logRepository

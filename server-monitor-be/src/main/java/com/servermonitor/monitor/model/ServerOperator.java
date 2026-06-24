@@ -24,5 +24,5 @@ public class ServerOperator {
 
     @ManyToOne
     @JoinColumn(name = "operator_id", nullable = false)
-    private User operator;
+    private Operator operator;
 }

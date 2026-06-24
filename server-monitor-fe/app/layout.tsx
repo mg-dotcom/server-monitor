@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/shared/Navigation";
+import { getMe } from "@/lib/server-api";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,18 +19,26 @@ export const metadata: Metadata = {
   description: "Monitor your servers with ease",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
+  let user = null;
+  try {
+    user = await getMe();
+  } catch {
+    user = null;
+  }
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-slate-950">
-        <Navigation />
+        <Navigation user={user} />
         <main className="flex-1">{children}</main>
       </body>
     </html>

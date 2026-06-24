@@ -1,6 +1,6 @@
 package com.servermonitor.monitor.config;
 
-import com.servermonitor.monitor.repository.UserRepository;
+import com.servermonitor.monitor.repository.OperatorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,12 +16,12 @@ import org.springframework.web.client.RestClient;
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
-    private final UserRepository userRepository;
+    private final OperatorRepository operatorRepository;
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        return username -> operatorRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Operator not found"));
     }
 
     @Bean

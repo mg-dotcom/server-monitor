@@ -4,8 +4,8 @@ import com.servermonitor.monitor.ApiResponse.ApiResponse;
 import com.servermonitor.monitor.dto.auth.LoginRequest;
 import com.servermonitor.monitor.dto.auth.MeResponse;
 import com.servermonitor.monitor.dto.auth.RegisterRequest;
-import com.servermonitor.monitor.dto.auth.AuthResponse; // Import DTO ตัวใหม่
-import com.servermonitor.monitor.model.User;
+import com.servermonitor.monitor.dto.auth.AuthResponse;
+import com.servermonitor.monitor.model.Operator;
 import com.servermonitor.monitor.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +37,7 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<MeResponse>> me() {
-        User operator = (User) SecurityContextHolder
+        Operator operator = (Operator) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();

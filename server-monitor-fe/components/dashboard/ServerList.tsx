@@ -3,8 +3,8 @@
 import { Server } from "@/types/server";
 import Link from "next/link";
 import { useState } from "react";
-import AddServerModal from "@/app/dashboard/AddServerModal";
 import { removeServer } from "@/app/dashboard/actions";
+import ServerFormModal from "./ServerFormModal";
 
 type Props = {
   servers: Server[];
@@ -13,6 +13,8 @@ type Props = {
 
 export default function ServerList({ servers, role }: Props) {
   const [showModal, setShowModal] = useState(false);
+  const [editingServer, setEditingServer] = useState<Server | null>(null);
+  const [modalMode, setModalMode] = useState<"add" | "edit">("add");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
@@ -31,6 +33,15 @@ export default function ServerList({ servers, role }: Props) {
     }
   };
 
+  const handleEdit = (id: string) => {
+    setShowModal(true);
+    const serverToEdit = servers.find((server) => server.id === id);
+    if (serverToEdit) {
+      setEditingServer(serverToEdit);
+      setModalMode("edit");
+    }
+  }
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -38,7 +49,11 @@ export default function ServerList({ servers, role }: Props) {
 
         {role === "ADMIN" && (
           <button
-            onClick={() => setShowModal(true)}
+            onClick={() => {
+              setShowModal(true);
+              setEditingServer(null);
+              setModalMode("add");
+            }}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
           >
             + Add Server
@@ -75,60 +90,89 @@ export default function ServerList({ servers, role }: Props) {
           </thead>
 
           <tbody>
-            {servers.map((server, idx) => (
-              <tr
-                key={server.id}
-                className="border-b border-slate-800 hover:bg-slate-800/50 transition-all duration-200 animate-slide-up"
-                style={{ animationDelay: `${idx * 0.05}s` }}
-              >
-                <td className="p-4 text-white font-medium">
-                  {server.name}
-                </td>
+            {servers.map((server, idx) => {
+              const isDisabled = !server.isMonitored;
+              return (
+                <tr
+                  key={server.id}
+                  className={`border-b border-slate-800 transition-all duration-200 animate-slide-up ${
+                    isDisabled
+                      ? "bg-slate-800/30 hover:bg-slate-800/40 opacity-60"
+                      : "hover:bg-slate-800/50"
+                  }`}
+                  style={{ animationDelay: `${idx * 0.05}s` }}
+                >
+                  <td className="p-4 text-white font-medium">
+                    {server.name}
+                  </td>
 
-                <td className="p-4">
-                  <span
-                    className={`inline-flex items-center gap-2 px-3 py-1 rounded-full font-semibold text-sm ${server.currentStatus === "UP"
-                      ? "bg-green-500/10 text-green-400 border border-green-500/30"
-                      : "bg-red-500/10 text-red-400 border border-red-500/30"
-                      }`}
-                  >
-                    <span
-                      className={`w-2 h-2 rounded-full ${server.currentStatus === "UP"
-                        ? "bg-green-400 animate-pulse-light"
-                        : "bg-red-400"
+                  <td className="p-4">
+                    {isDisabled ? (
+                      <span className="inline-flex items-center px-3 py-1 rounded-full font-semibold text-sm bg-slate-700 text-slate-300 border border-slate-600">
+                        Not Monitored
+                      </span>
+                    ) : (
+                      <span
+                        className={`inline-flex items-center gap-2 px-3 py-1 rounded-full font-semibold text-sm ${
+                          server.currentStatus === "UP"
+                            ? "bg-green-500/10 text-green-400 border border-green-500/30"
+                            : "bg-red-500/10 text-red-400 border border-red-500/30"
                         }`}
-                    />
-                    {server.currentStatus}
-                  </span>
-                </td>
-
-                <td className="p-4 text-slate-300 font-mono text-sm">
-                  {server.endpoint}
-                </td>
-
-                <td className="p-4">
-                  <div className="flex items-center gap-1">
-                    <Link
-                      href={`/dashboard/servers/${server.id}`}
-                      className="inline-flex items-center gap-1 px-3 py-2 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 rounded-lg transition-all duration-200 active:scale-95"
-                    >
-                      <span>View</span>
-                    </Link>
-
-                    {role === "ADMIN" && (
-                      <button
-                        onClick={() => handleDelete(server.id, server.name)}
-                        disabled={deletingId === server.id}
-                        className="inline-flex items-center px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {deletingId === server.id ? "Removing..." : "Remove"}
-                      </button>
+                        <span
+                          className={`w-2 h-2 rounded-full ${
+                            server.currentStatus === "UP"
+                              ? "bg-green-400 animate-pulse-light"
+                              : "bg-red-400"
+                          }`}
+                        />
+                        {server.currentStatus}
+                      </span>
                     )}
+                  </td>
 
-                  </div>
-                </td>
-              </tr>
-            ))}
+                  <td className="p-4 text-slate-300 font-mono text-sm">
+                    {server.endpoint}
+                  </td>
+
+                  <td className="p-4">
+                    <div className="flex items-center gap-1">
+                      {isDisabled ? (
+                        <div className="inline-flex items-center gap-1 px-3 py-2 text-slate-500 bg-slate-800/30 rounded-lg cursor-not-allowed opacity-50">
+                          <span>View</span>
+                        </div>
+                      ) : (
+                        <Link
+                          href={`/dashboard/servers/${server.id}`}
+                          className="inline-flex items-center gap-1 px-3 py-2 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 rounded-lg transition-all duration-200 active:scale-95"
+                        >
+                          <span>View</span>
+                        </Link>
+                      )}
+
+                      {role === "ADMIN" && (
+                        <button
+                          onClick={() => handleEdit(server.id)}
+                          className="inline-flex items-center px-3 py-2 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10 rounded-lg transition-all duration-200 active:scale-95"
+                        >
+                          Edit
+                        </button>
+                      )}
+
+                      {role === "ADMIN" && (
+                        <button
+                          onClick={() => handleDelete(server.id, server.name)}
+                          disabled={deletingId === server.id}
+                          className="inline-flex items-center px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {deletingId === server.id ? "Removing..." : "Remove"}
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
 
@@ -153,7 +197,11 @@ export default function ServerList({ servers, role }: Props) {
       </div>
 
       {showModal && (
-        <AddServerModal onClose={() => setShowModal(false)} />
+        <ServerFormModal
+          onClose={() => setShowModal(false)}
+          existingServer={editingServer}
+          mode={modalMode}
+        />
       )}
     </div>
   );

@@ -49,12 +49,6 @@ export default function Home() {
             >
               Get Started
             </Link>
-            <Link
-              href="/dashboard"
-              className="px-8 py-3 border border-slate-700 hover:border-slate-600 text-slate-300 hover:text-white font-semibold rounded-lg transition-all duration-200 hover:bg-slate-900 active:scale-95 text-center"
-            >
-              View Dashboard
-            </Link>
           </div>
 
           {/* Features */}

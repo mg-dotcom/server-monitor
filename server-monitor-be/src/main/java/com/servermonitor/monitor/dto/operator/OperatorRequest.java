@@ -1,4 +1,4 @@
-package com.servermonitor.monitor.dto.user;
+package com.servermonitor.monitor.dto.operator;
 
 import com.servermonitor.monitor.model.Role;
 import jakarta.validation.constraints.NotBlank;
@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class UserRequest {
+public class OperatorRequest {
     @NotBlank(message = "Username is required")
     private String username;
     @NotBlank(message = "First name is required")

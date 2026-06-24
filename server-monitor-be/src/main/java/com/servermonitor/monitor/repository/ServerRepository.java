@@ -9,4 +9,6 @@ public interface ServerRepository extends JpaRepository<Server, String> {
     List<Server> findByIsMonitoredIsTrue();
 
     boolean existsByEndpoint(String endpoint);
+
+    List<Server> findAllByServerOperators_OperatorId(String operatorId);
 }

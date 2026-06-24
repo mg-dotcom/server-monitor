@@ -10,6 +10,13 @@ type AddServerInput = {
   endpoint: string;
 };
 
+type UpdateServerInput = {
+  id: string;
+  name: string;
+  endpoint: string;
+  isMonitored?: boolean;
+};
+
 async function authHeader() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
@@ -52,6 +59,15 @@ export async function addServer({ name, endpoint }: AddServerInput) {
   });
 
   revalidatePath("/dashboard");
+}
+
+export async function updateServer({ id, name, endpoint, isMonitored }: UpdateServerInput) {
+  await api.put(`/servers/${id}`, { name, endpoint, isMonitored }, {
+    headers: await authHeader(),
+  });
+
+  revalidatePath("/dashboard");
+  revalidatePath(`/dashboard/servers/${id}`);
 }
 
 export async function removeServer(id: string) {

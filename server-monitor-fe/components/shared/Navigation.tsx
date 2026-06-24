@@ -3,14 +3,18 @@
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { logoutAction } from "@/app/dashboard/actions";
+import { AuthenticatedUser } from "@/types/auth";
 
-export default function Navigation() {
+type NavigationProps = {
+    user: AuthenticatedUser | null 
+}
+
+export default function Navigation( { user }: NavigationProps) {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Show back button on all pages except home and login
   const showBackButton = pathname !== "/" && pathname !== "/login";
-  const showLogoutButton = pathname !== "/" && pathname !== "/login";
+  const showLogoutButton = !!user && pathname !== "/" && pathname !== "/login";
 
   return (
     <nav className="bg-slate-900 border-b border-slate-800 sticky top-0 z-40">
@@ -48,7 +52,15 @@ export default function Navigation() {
           </Link>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
+          {showLogoutButton && user && (
+            <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700">
+              <div className="flex flex-col">
+                <span className="text-sm text-white font-medium">{user.username}</span>
+                <span className="text-xs text-slate-400">{user.role}</span>
+              </div>
+            </div>
+          )}
           {showLogoutButton && (
             <button
               onClick={async () => {

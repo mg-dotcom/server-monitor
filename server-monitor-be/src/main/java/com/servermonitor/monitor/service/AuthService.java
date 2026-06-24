@@ -1,8 +1,8 @@
 package com.servermonitor.monitor.service;
 
 import com.servermonitor.monitor.dto.auth.RegisterRequest;
-import com.servermonitor.monitor.model.User;
-import com.servermonitor.monitor.repository.UserRepository;
+import com.servermonitor.monitor.model.Operator;
+import com.servermonitor.monitor.repository.OperatorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
     private final AuthenticationManager authenticationManager;
-    private final UserRepository userRepository;
+    private final OperatorRepository operatorRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
@@ -24,7 +24,7 @@ public class AuthService {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
-            User operator = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+            Operator operator = operatorRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Operator not found"));
 
             return jwtService.generateToken(username, operator.getRole().name());
         } catch (BadCredentialsException e) {
@@ -32,17 +32,17 @@ public class AuthService {
         }
     }
     public String register(RegisterRequest request) {
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+        if (operatorRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new RuntimeException("Username already exists");
         }
 
-        User operator = User.builder()
+        Operator operator = Operator.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
                 .build();
 
-        userRepository.save(operator);
+        operatorRepository.save(operator);
 
         return jwtService.generateToken(operator.getUsername(), operator.getRole().name());
     }

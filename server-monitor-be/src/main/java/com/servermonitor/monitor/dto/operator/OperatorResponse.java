@@ -1,12 +1,12 @@
-package com.servermonitor.monitor.dto.user;
+package com.servermonitor.monitor.dto.operator;
 
-import com.servermonitor.monitor.model.Role; // 👈 อย่าลืม Import Role
+import com.servermonitor.monitor.model.Role;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class UserResponse {
+public class OperatorResponse {
     private String id;
     private String name;
     private String lineUserId;
