@@ -11,7 +11,9 @@ A full-stack server health monitoring dashboard with real-time status tracking a
 | Operator | demo_operator | demo1234 |
 
 > **Admin** — full access: add/edit/remove servers, assign operators
-> **Operator** — view only: receives LINE alerts when assigned server goes DOWN
+> **Operator** — view only: restricted permissions to demonstrate Role-Based Access Control (RBAC)
+
+⚠️ **Note:** To prevent spam, the LINE push notification feature is disabled for public demo accounts. Please check the **LINE Alert Preview** section below to see the real-time notification in action!
 
 ---
 
@@ -19,9 +21,9 @@ A full-stack server health monitoring dashboard with real-time status tracking a
 
 - **Auto Health Check** — polls registered endpoints every 30s via scheduled job
 - **Status Tracking** — logs UP / DOWN / UNKNOWN per server, alerts only on status change
-- **LINE Alerts** — pushes alert to assigned operators when server goes DOWN or recovers
-- **Role-based Access** — ADMIN manages servers & operators, OPERATOR receives alerts only
-- **Operator Assignment** — assign multiple operators per server, alert on assign if server is DOWN
+- **LINE Alerts** — uses targeted Push Messages to notify assigned operators when a server goes DOWN or recovers
+- **Role-based Access** — ADMIN manages servers & operators, OPERATOR receives alerts and has view-only access
+- **Operator Assignment** — assign multiple operators per server, triggers alert on assign if server is DOWN
 
 ---
 
@@ -40,7 +42,7 @@ A full-stack server health monitoring dashboard with real-time status tracking a
 
 ## Architecture
 
-```
+```text
 Next.js (Vercel)
     │
     ├── Server Actions → Spring Boot REST API (Railway)
@@ -52,10 +54,13 @@ Next.js (Vercel)
     └── StatusPoller (client) → router.refresh() every 30s
 ```
 
----
-
 ## ER Diagram
 
 <img width="2270" height="1270" alt="supabase-schema-hrkgvhzpbyyrzeyaiiaq" src="https://github.com/user-attachments/assets/2ac7a441-fef0-40cc-b3d1-99b0519c044e" />
 
-```
+---
+
+## LINE Alert Preview
+Targeted push notifications (using specific LINE User IDs) sent exclusively to assigned operators when a server goes DOWN or recovers. No spammy broadcasts.
+
+https://github.com/user-attachments/assets/42a8cbd3-a3e3-4c8e-b644-afb287d11120
