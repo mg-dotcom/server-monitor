@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "users")
+@Table(name = "operators")
 public class Operator implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
