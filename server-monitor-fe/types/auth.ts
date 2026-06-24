@@ -1,4 +1,5 @@
 export interface AuthenticatedUser {
-  role: "ADMIN" | "OPERATOR";
   username: string;
+  name: string;
+  role: "ADMIN" | "OPERATOR";
 }

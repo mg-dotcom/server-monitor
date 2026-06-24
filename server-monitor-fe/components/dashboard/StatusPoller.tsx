@@ -7,9 +7,7 @@ type Props = {
   intervalMs?: number;
 };
 
-// test - 10000 ms (10 sec)
-// prod - 60000 ms (1 min)  
-export default function StatusPoller({ intervalMs = 60000 }: Props) {
+export default function StatusPoller({ intervalMs = 30000 }: Props) {
   const router = useRouter();
 
   useEffect(() => {

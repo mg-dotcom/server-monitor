@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,8 +23,7 @@ public class MonitorService {
 
     
     @Transactional
-    // @Scheduled(fixedRate = 10000) // test - 10 วิ
-    @Scheduled(fixedRate = 300000) // prod - 5 นาที
+    @Scheduled(fixedRate = 30000)
     public void checkServers() {
         List<Server> servers = serverRepository.findByIsMonitoredIsTrue();
         for (Server server : servers) {
@@ -40,7 +40,7 @@ public class MonitorService {
                 }
             } catch (Exception e) {
                 boolean statusChanged = saveLogIfChanged(server, ServerStatus.DOWN, e.getMessage());
-                if (statusChanged) { // แปลว่าเพิ่งเปลี่ยนจาก UP → DOWN
+                if (statusChanged) {
                     String alertMessage = """
                             🚨 [ALERT] Server DOWN!
                                - Server: %s
@@ -54,20 +54,19 @@ public class MonitorService {
     }
 
     private Boolean saveLogIfChanged(Server server, ServerStatus status, String detail) {
-        List<Log> logs = logRepository.findByServerIdOrderByCreatedAtDesc(server.getId());
-        Log latestLog = logs.isEmpty() ? null : logs.getFirst();
+        Optional<Log> latestLog = logRepository.findFirstByServerIdOrderByCreatedAtDesc(server.getId());
 
-        if (latestLog == null) {
+        if (latestLog.isEmpty()) {
             logRepository.save(saveLogToDb(status, detail, server));
-            return status == ServerStatus.DOWN; // ครั้งแรก DOWN = alert
+            return status == ServerStatus.DOWN;
         }
 
-        if (latestLog.getStatus() != status) {
+        if (latestLog.get().getStatus() != status) {
             logRepository.save(saveLogToDb(status, detail, server));
-            return true; // status เปลี่ยน = ต้อง alert
+            return true;
         }
 
-        return false; // status เหมือนเดิม = ไม่ต้อง alert
+        return false;
     }
 
     private Log saveLogToDb(ServerStatus status, String detail, Server server) {

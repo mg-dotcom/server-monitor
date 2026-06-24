@@ -6,14 +6,14 @@ import { logoutAction } from "@/app/dashboard/actions";
 import { AuthenticatedUser } from "@/types/auth";
 
 type NavigationProps = {
-    user: AuthenticatedUser | null 
+  user: AuthenticatedUser | null
 }
 
-export default function Navigation( { user }: NavigationProps) {
+export default function Navigation({ user }: NavigationProps) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const showBackButton = pathname !== "/" && pathname !== "/login";
+  const showBackButton = pathname !== "/" && pathname !== "/login" && pathname !== "/dashboard";
   const showLogoutButton = !!user && pathname !== "/" && pathname !== "/login";
 
   return (
@@ -54,11 +54,25 @@ export default function Navigation( { user }: NavigationProps) {
 
         <div className="flex items-center gap-4">
           {showLogoutButton && user && (
-            <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700">
+            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-slate-900/50 border border-slate-700/50 shadow-sm hover:bg-slate-800/80 transition-all duration-200">
               <div className="flex flex-col">
-                <span className="text-sm text-white font-medium">{user.username}</span>
-                <span className="text-xs text-slate-400">{user.role}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-slate-100 font-semibold tracking-wide">
+                    {user.username}
+                  </span>
+                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${user.role === "ADMIN"
+                      ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
+                      : "bg-blue-500/10 text-blue-400 border-blue-500/30"
+                    }`}>
+                    {user.role}
+                  </span>
+                </div>
+
+                <span className="text-xs text-slate-400 mt-0.5">
+                  {user.name}
+                </span>
               </div>
+
             </div>
           )}
           {showLogoutButton && (

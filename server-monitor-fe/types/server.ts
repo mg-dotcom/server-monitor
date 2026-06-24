@@ -1,4 +1,4 @@
-export type ServerStatus = "UP" | "DOWN" | "UNKNOWN";
+export type ServerStatus = "UP" | "DOWN" | "UNKNOWN" | "CHECKING";
 
 export interface Operator {
   id: string;

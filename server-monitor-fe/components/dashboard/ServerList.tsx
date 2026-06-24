@@ -107,25 +107,33 @@ export default function ServerList({ servers, role }: Props) {
                   </td>
 
                   <td className="p-4">
-                    {isDisabled ? (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full font-semibold text-sm bg-slate-700 text-slate-300 border border-slate-600">
+                    {server.currentStatus === "CHECKING" ? (
+                      <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full font-medium text-xs bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 animate-pulse">
+                        <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Checking
+                      </span>
+                    ) : isDisabled ? (
+                      <span className="inline-flex items-center px-3 py-1 rounded-full font-medium text-xs bg-slate-800 text-slate-400 border border-slate-700">
                         Not Monitored
                       </span>
                     ) : (
                       <span
-                        className={`inline-flex items-center gap-2 px-3 py-1 rounded-full font-semibold text-sm ${
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-medium text-xs border ${
                           server.currentStatus === "UP"
-                            ? "bg-green-500/10 text-green-400 border border-green-500/30"
-                            : "bg-red-500/10 text-red-400 border border-red-500/30"
+                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                            : server.currentStatus === "UNKNOWN"
+                            ? "bg-slate-500/10 text-slate-400 border-slate-500/30"
+                            : "bg-rose-500/10 text-rose-400 border-rose-500/30" // พวก DOWN หรือ ERROR
                         }`}
                       >
-                        <span
-                          className={`w-2 h-2 rounded-full ${
-                            server.currentStatus === "UP"
-                              ? "bg-green-400 animate-pulse-light"
-                              : "bg-red-400"
-                          }`}
-                        />
+                        <span className={`w-1.5 h-1.5 rounded-full ${
+                          server.currentStatus === "UP" ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" : 
+                          server.currentStatus === "UNKNOWN" ? "bg-slate-400" : 
+                          "bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.8)]"
+                        }`}></span>
                         {server.currentStatus}
                       </span>
                     )}
@@ -137,8 +145,11 @@ export default function ServerList({ servers, role }: Props) {
 
                   <td className="p-4">
                     <div className="flex items-center gap-1">
-                      {isDisabled ? (
-                        <div className="inline-flex items-center gap-1 px-3 py-2 text-slate-500 bg-slate-800/30 rounded-lg cursor-not-allowed opacity-50">
+                      {isDisabled || server.currentStatus === "CHECKING" || server.currentStatus === "UNKNOWN" ? (
+                        <div 
+                          className="inline-flex items-center gap-1 px-3 py-2 text-slate-500 bg-slate-800/30 rounded-lg cursor-not-allowed opacity-50"
+                          title={isDisabled ? "Not Monitored" : "Waiting for status update..."} // ✨ แอบใส่ title ให้รู้ว่าทำไมกดไม่ได้
+                        >
                           <span>View</span>
                         </div>
                       ) : (

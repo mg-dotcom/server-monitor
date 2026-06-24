@@ -142,7 +142,6 @@ export default function ServerFormModal({ onClose, mode, existingServer }: Props
                             </label>
                         </div>
                     )}
-
                     {error && (
                         <div className="bg-red-950/40 border border-red-900/50 text-red-400 px-4 py-3 rounded-lg text-sm animate-shake">
                             {error}
@@ -175,7 +174,6 @@ export default function ServerFormModal({ onClose, mode, existingServer }: Props
                     </div>
                 </form>
             </div>
-        </div>,
-        document.body
+        </div>,document.body
     );
 }

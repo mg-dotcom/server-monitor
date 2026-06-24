@@ -8,5 +8,6 @@ import lombok.Data;
 @Builder
 public class MeResponse {
     private String username;
+    private String name;
     private Role role;
 }

@@ -44,6 +44,7 @@ public class AuthController {
 
         return ResponseEntity.ok(ApiResponse.ok(
                 MeResponse.builder()
+                        .name(operator.getFirstName() + " " + operator.getLastName())
                         .username(operator.getUsername())
                         .role(operator.getRole())
                         .build()

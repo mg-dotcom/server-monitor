@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -86,17 +87,15 @@ public class OperatorService {
 
         serverOperatorRepository.save(serverOperator);
 
-        Log latestLog = logRepository
-                .findFirstByServerIdOrderByCreatedAtDesc(serverId)
-                .orElse(null);
+        Optional<Log> latestLog = logRepository.findFirstByServerIdOrderByCreatedAtDesc(serverId);
 
-        if (latestLog != null && latestLog.getStatus() == ServerStatus.DOWN) {
+        if (latestLog.isPresent() && latestLog.get().getStatus() == ServerStatus.DOWN) {
             String alertMessage = """
-            🚨 [ALERT] Server DOWN!
-               - Server: %s
-               - URL: %s
-               - Error: %s
-            """.formatted(existingServer.getName(), existingServer.getEndpoint(), latestLog.getDetail());
+        🚨 [ALERT] Server DOWN!
+           - Server: %s
+           - URL: %s
+           - Error: %s
+        """.formatted(existingServer.getName(), existingServer.getEndpoint(), latestLog.get().getDetail());
             linePushMessageToOperator.pushMessageToOperator(existingOperator, alertMessage);
         }
     }

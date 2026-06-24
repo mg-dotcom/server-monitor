@@ -74,7 +74,15 @@ public class ServerService {
             existingServer.setIsMonitored(request.getIsMonitored());
         }
 
-        return toServerRespond(serverRepository.save(existingServer));
+        Server saved = serverRepository.save(existingServer);
+
+        logRepository.save(Log.builder()
+                .status(ServerStatus.CHECKING)
+                .detail("Rechecking after server update")
+                .server(saved)
+                .build());
+
+        return toServerRespond(saved);
     }
 
     public String deleteServer(String id) {
@@ -95,7 +103,7 @@ public class ServerService {
 
         ServerStatus currentStatus = logRepository
                 .findFirstByServerIdOrderByCreatedAtDesc(server.getId())
-                .map(Log::getStatus)
+                .map(log -> log.getStatus())
                 .orElse(ServerStatus.UNKNOWN);
 
         return ServerResponse.builder()
