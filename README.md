@@ -33,10 +33,10 @@ A full-stack server health monitoring dashboard with real-time status tracking a
 |---|---|
 | Frontend | Next.js 15, TypeScript, Tailwind CSS |
 | Backend | Java Spring Boot, Spring Security (JWT) |
-| Database | PostgreSQL (Railway) |
+| Database | PostgreSQL |
 | Scheduler | Spring `@Scheduled` |
 | Notification | LINE Messaging API |
-| Deployment | Vercel (FE), Railway (BE + DB) |
+| Deployment | Vercel (FE), Railway (BE), Supabase (DB) |
 
 ---
 
